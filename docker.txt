@@ -51,6 +51,16 @@ sudo docker network rm network_name // remove etwork with network name
 
 
 
+Connect mysql with phpmyadmin:-
+
+sudo docker run -d --name mysql --network mongo-network -e MYSQL_ROOT_PASSWORD=rootpassword -e MYSQL_DATABASE=testdb -e MYSQL_USER=user -e MYSQL_PASSWORD=userpassword -v mysql_data:/var/lib/mysql -p 3307:3306 mysql:8.0
+
+sudo docker run -d  --name phpmyadmin --network mongo-network -e PMA_HOST=mysql -e PMA_PORT=3306 -e MYSQL_ROOT_PASSWORD=rootpassword -p 8080:80 phpmyadmin:5.2.2
+
+sudo docker exec -it 8b5e45a7d017 mysql -uroot -p
+
+
+
 sudo docker run -d \
 -p27017:27017 \
 --name mongo \
