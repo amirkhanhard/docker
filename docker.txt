@@ -1,38 +1,54 @@
-docker pull hello-world //
+sudo docker ps -a // list all containers
 
-docker pull hello-world:9.0  // download specific version
+sudo docker ps // list all active containers
 
 
-docker run hello-world //create new container from image | also pull and run container | --name mysql-older for custom container name, name must be before port and container name
+sudo docker pull hello-world // pull the images from docker hub with latest version
 
-docker ps -a // list all containers
+sudo docker pull hello-world:9.0 | hello-world:linux  // pull the image with specific version from docker hub
 
-docker ps // list all active containers
+sudo docker run hello-world // create new container from image | if not found locally then also pull and run container  |  container name
 
-docker stop|start  contid, contname // start stop docker container with id or name
+sudo docker run --name aktest ubuntu // --name mysql-older for custom container name, name must be before port and image name
 
-sudo docker rmi image_name or image_id // remove image_id and image_name | before deleting image we need to delete container
+sudo docker run -it --name aktest ubuntu // -it for interactive mode we go into the image interactively, used by ubuntu etc
+
+sudo docker stop|start  cont_id, cont_name // start stop docker container with id or name
+
+sudo docker rm cont_id, cont_name // remove docker container with id or name, we should stop the container or forcefully remove
+
+sudo docker rm c496f23f6ff9 -f // -f forcefully remove the container
+
+
+
+sudo docker images // list all images pulled from docker hub
 
 sudo docker run -d -e MYSQL_ROOT_PASSWORD=my-secret-pw -d mysql:tag // tag specific run docker
 sudo docker run -d -e MYSQL_ROOT_PASSWORD=my-secret-pw -d mysql:8.0
 
-sudo docker run -d -e MYSQL_ROOT_PASSWORD=my-secret-pw -d -p8080:3306 mysql:8.0 // 
-sudo docker run -d -e MYSQL_ROOT_PASSWORD=my-secret-pw -d --name mysql-older -p8080:3306  mysql:8.0 
+sudo docker run -d -e MYSQL_ROOT_PASSWORD=qwerty -d --name mysql-older -p8080:3306  mysql:8.0 // run container with port and custom name
+
+sudo docker exec -it 8b5e45a7d017 mysql -uroot -p // log into terminal of the mysql
+
+sudo docker rmi image_name or image_id // remove image using image_id or image_name | Before deleting image we need to delete container
 
 
 
-docker logs cont_id
-docker exec -it cont_id|cont_name /bin/bash
-sudo docker exec -it mysql-older /bin/bash
+sudo docker logs cont_id|cont_name // check logs with container id
+
+sudo docker exec -it cont_id|cont_name /bin/bash //execute base shell command.
+
+sudo docker exec -it cont_id|cont_name /bin/sh   //execute shell command.
 
 
-docker exec -it cont_id|cont_name /bin/sh
+
+sudo docker network ls // list all network
+
+sudo docker network create  mongo-network // create custom network
+
+sudo docker network rm network_name // remove etwork with network name
 
 
-sudo docker network ls //list all network
-docker network rm network_name // delete network
-
-sudo docker network create  mongo-network
 
 sudo docker run -d \
 -p27017:27017 \
