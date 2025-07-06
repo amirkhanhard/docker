@@ -1,3 +1,4 @@
+
 sudo docker ps -a // list all containers
 
 sudo docker ps // list all active containers
@@ -63,6 +64,7 @@ sudo docker run -d \
 --name mongo-express \
 --network  mongo-network \
 -e ME_CONFIG_BASICAUTH_USERNAME=admin \
+-e ME_CONFIG_BASICAUTH_PASSWORD=admin123 \
 -e ME_CONFIG_MONGODB_URL="mongodb://admin:qwerty@mongo:27017" \
 mongo-express
 
