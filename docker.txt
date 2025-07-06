@@ -1,0 +1,56 @@
+docker pull hello-world //
+
+docker pull hello-world:9.0  // download specific version
+
+
+docker run hello-world //create new container from image | also pull and run container | --name mysql-older for custom container name, name must be before port and container name
+
+docker ps -a // list all containers
+
+docker ps // list all active containers
+
+docker stop|start  contid, contname // start stop docker container with id or name
+
+sudo docker rmi image_name or image_id // remove image_id and image_name | before deleting image we need to delete container
+
+sudo docker run -d -e MYSQL_ROOT_PASSWORD=my-secret-pw -d mysql:tag // tag specific run docker
+sudo docker run -d -e MYSQL_ROOT_PASSWORD=my-secret-pw -d mysql:8.0
+
+sudo docker run -d -e MYSQL_ROOT_PASSWORD=my-secret-pw -d -p8080:3306 mysql:8.0 // 
+sudo docker run -d -e MYSQL_ROOT_PASSWORD=my-secret-pw -d --name mysql-older -p8080:3306  mysql:8.0 
+
+
+
+docker logs cont_id
+docker exec -it cont_id|cont_name /bin/bash
+sudo docker exec -it mysql-older /bin/bash
+
+
+docker exec -it cont_id|cont_name /bin/sh
+
+
+sudo docker network ls //list all network
+docker network rm network_name // delete network
+
+sudo docker network create  mongo-network
+
+sudo docker run -d \
+-p27017:27017 \
+--name mongo \
+--network  mongo-network \
+-e MONGO_INITDB_ROOT_USERNAME=admin \
+-e MONGO_INITDB_ROOT_PASSWORD=qwerty \
+mongo
+
+sudo docker run -d \
+-p8081:8081 \
+--name mongo-express \
+--network  mongo-network \
+-e ME_CONFIG_BASICAUTH_USERNAME=admin \
+-e ME_CONFIG_MONGODB_URL="mongodb://admin:qwerty@mongo:27017" \
+mongo-express
+
+
+
+docker compose -f mongodb.yaml up -d 
+docker compose -f mongodb.yaml down
