@@ -1,4 +1,12 @@
 
+Note:
+1. we can remove container forcefully if it is running.
+2. we can create custom file and specify the filename while running "docker build" for building an image.
+3. we can set the reference of another dockerfile in docker-compose yaml file to create build.
+4. 
+
+
+
 sudo docker ps -a // list all containers
 
 sudo docker ps // list all active containers
@@ -48,6 +56,68 @@ sudo docker network ls // list all network
 sudo docker network create  mongo-network // create custom network
 
 sudo docker network rm network_name // remove etwork with network name
+
+There are some predefined network which cant be deleted - bridge, host, none
+
+
+
+==> Build image:
+
+-t for tag
+php-application - is image name with latest tag.
+. is the current directory.
+
+sudo docker build -f ./DockerPhp.dev -t php-application .
+
+
+==> execute shell command in docker container. List all file in app directory.
+docker exec -it <container_name_or_id> ls -l /path/to/app
+sudo docker exec -it 6f5ecca49083 ls -l /app
+
+
+==> download files from container.
+docker cp <container_id_or_name>:/path/in/container /path/on/host
+sudo docker cp 6f5ecca49083:/app/test.json ./
+
+
+==> Copy local file into container.
+docker cp ./my-local-folder my-container:/app/
+docker cp ./test3.json 6f5ecca49083:/app/
+
+
+==> Create new file in container
+sudo docker exec -it 6f5ecca49083 touch /app/test2.json
+
+
+==> list:
+sudo docker exec -it 6f5ecca49083 ls -l /app/
+sudo docker exec -it 6f5ecca49083 ls -l /var/www/html/ak/dock/dock2/
+
+
+==> ubuntu - Login as interactive mode in ubuntu.
+sudo docker run -it ubuntu
+
+
+==> automatically pick the following files for build. 
+docker-compose.yml, docker-compose.yaml, compose.yml, compose.yaml
+
+docker-compose up --build
+
+
+==> Start the container for the docker-compose file.
+sudo docker-compose start
+
+
+==> Stop containers from docker-compose file.
+sudo docker-compose stop
+
+
+==> Stop container and remove container  from docker-compose file.
+sudo docker-compose down
+
+
+==> run container in detech mode on port 3003
+sudo docker run -d -p 3003:3000 react-application
 
 
 

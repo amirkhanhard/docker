@@ -1,0 +1,14 @@
+version: "3.8"
+
+services:
+  react-app:
+    build:
+      context: ./                 # Directory to use as build context (current dir)
+      dockerfile: Dockerfile  # Use custom Dockerfile named DockerPhp.dev
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./app/:/app           # Mount local directory to container
+      - /app/node_modules  # Avoid overwriting node_modules
+    stdin_open: true
+    tty: true

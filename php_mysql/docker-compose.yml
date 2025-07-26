@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  mysql2:
+    image: mysql:8.0
+    container_name: mysql2
+    restart: always
+    ports:
+      - "3307:3306"           # Host port 3307 → Container port 3306 (MySQL)
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: testdb
+      MYSQL_USER: user
+      MYSQL_PASSWORD: userpassword
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - n1
+
+  phpmyadmin:
+    image: phpmyadmin:5.2.2
+    container_name: phpmyadmin
+    restart: always
+    ports:
+      - "8080:80"             # Host port 8080 → Container port 80 (phpMyAdmin)
+    environment:
+      PMA_HOST: mysql2        # Refers to the `mysql2` service name
+      PMA_PORT: 3306
+      MYSQL_ROOT_PASSWORD: rootpassword
+    depends_on:
+      - mysql2
+    networks:
+      - n1
+
+volumes:
+  mysql_data:
+
+networks:
+  n1:
+    driver: bridge

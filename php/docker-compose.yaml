@@ -1,0 +1,65 @@
+# Use Docker Compose version 3.8
+version: '3.8'
+
+services:
+  php:
+    build:
+      context: ./                 # Directory to use as build context (current dir)
+      dockerfile: DockerPhp.dev  # Use custom Dockerfile named DockerPhp.dev
+    volumes:
+      - ./src:/var/www/html      # Mount local ./src to /var/www/html in the container
+    depends_on:
+      - mysql                    # Start 'php' service after 'mysql' is ready
+    networks:
+      - php_network              # Connect 'php' service to a custom bridge network
+
+  nginx:
+    image: nginx:latest          # Use the latest official Nginx image
+    ports:
+      - "8080:80"                # Map host port 8080 to container port 80
+    volumes:
+      - ./src:/var/www/html      # Serve files from ./src as root in container
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf  # Custom Nginx config
+    depends_on:
+      - php                      # Ensure 'php' is started before Nginx
+    networks:
+      - php_network              # Connect to the same custom network as PHP/MySQL
+
+  mysql:
+    image: mysql:5.7             # Use MySQL version 5.7
+    restart: always              # Always restart this service on crash/failure
+    environment:
+      MYSQL_ROOT_PASSWORD: root # Set MySQL root password
+      MYSQL_DATABASE: app_db    # Create a database named 'app_db'
+      MYSQL_USER: user          # Create a user named 'user'
+      MYSQL_PASSWORD: password  # Set password for the created user
+    volumes:
+      - db_data:/var/lib/mysql  # Persist MySQL data in a named volume
+    networks:
+      - php_network              # Connect to the custom bridge network
+
+  phpmyadmin:
+    image: phpmyadmin:5.2.2      # Use phpMyAdmin version 5.2.2
+    container_name: phpmyadmin   # Name the container explicitly
+    restart: always              # Auto-restart on failure
+    ports:
+      - "8090:80"                # Host port 8090 → Container port 80 for phpMyAdmin UI
+    environment:
+      PMA_HOST: mysql            # phpMyAdmin connects to MySQL container by service name
+      PMA_PORT: 3306             # Default MySQL port
+      MYSQL_ROOT_PASSWORD: root # Provide root password to access MySQL
+      MYSQL_USER: user          # Optional: Access via this user
+      MYSQL_PASSWORD: password  # Optional: Password for the user
+    depends_on:
+      - mysql                    # Wait for MySQL to be ready before starting
+    networks:
+      - php_network              # Same network for connectivity
+
+# Named volume for persistent MySQL data
+volumes:
+  db_data:
+
+# Custom bridge network to allow inter-container communication by service name
+networks:
+  php_network:
+    driver: bridge
