@@ -3,7 +3,10 @@ Note:
 1. we can remove container forcefully if it is running.
 2. we can create custom file and specify the filename while running "docker build" for building an image.
 3. we can set the reference of another dockerfile in docker-compose yaml file to create build.
-4. 
+4. docker environment variables are nothing but just configuration values required by images and may be required by other images.
+These values can be overwritten by your files or configuration in containers.
+for example max upload file size, max execution time can be set on running container as well as in container's php.ini file.
+for another example root user and password required by mysql can be used in phpmyadmin images.
 
 
 
