@@ -134,6 +134,24 @@ sudo docker exec -it 8b5e45a7d017 mysql -uroot -p
 
 
 
+Vite Old version docker:- We can not use docker file in this build we need to separtely exute the dockerfile.
+
+version: '2.4'  # Compatible with older Docker Engine (pre-2017) and Compose v1.x
+
+services:
+  react:
+    build: .
+    ports:
+      - "3011:5173"
+    volumes:
+      - ./app/src:/app/src
+    tty: true
+    stdin_open: true
+    environment:
+      - HOST=0.0.0.0
+
+
+
 
 sudo docker run -d \
 -p27017:27017 \
