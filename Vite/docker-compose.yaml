@@ -1,0 +1,17 @@
+version: "3.8"
+
+services:
+  react-app:
+    build:
+      context: .                   # Root directory of your Docker project
+      dockerfile: Dockerfile       # Dockerfile name
+    ports:
+      - "3011:5173"                # Map host:container port (host 3011 → container 5173)
+    volumes:
+      - ./app/src:/app/src                 # Mount app directory for live changes
+      #- /app/node_modules          # Prevent local node_modules overwrite
+    stdin_open: true
+    tty: true
+    environment:
+      - HOST=0.0.0.0               # Required for Vite to listen on all interfaces
+
