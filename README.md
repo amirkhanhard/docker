@@ -1,1 +1,207 @@
-# docker
+
+Note:
+1. we can remove container forcefully if it is running.
+2. we can create custom file and specify the filename while running "docker build" for building an image.
+3. we can set the reference of another dockerfile in docker-compose yaml file to create build.
+4. docker environment variables are nothing but just configuration values required by images and may be required by other images.
+These values can be overwritten by your files or configuration in containers.
+for example max upload file size, max execution time can be set on running container as well as in container's php.ini file.
+for another example root user and password required by mysql can be used in phpmyadmin images.
+
+
+
+sudo docker ps -a // list all containers
+
+sudo docker ps // list all active containers
+
+
+sudo docker pull hello-world // pull the images from docker hub with latest version
+
+sudo docker pull hello-world:9.0 | hello-world:linux  // pull the image with specific version from docker hub
+
+sudo docker run hello-world // create new container from image | if not found locally then also pull and run container  |  container name
+
+sudo docker run --name aktest ubuntu // --name mysql-older for custom container name, name must be before port and image name
+
+sudo docker run -it --name aktest ubuntu // -it for interactive mode we go into the image interactively, used by ubuntu etc
+
+sudo docker stop|start  cont_id, cont_name // start stop docker container with id or name
+
+sudo docker rm cont_id, cont_name // remove docker container with id or name, we should stop the container or forcefully remove
+
+sudo docker rm c496f23f6ff9 -f // -f forcefully remove the container
+
+
+
+sudo docker images // list all images pulled from docker hub
+
+sudo docker run -d -e MYSQL_ROOT_PASSWORD=my-secret-pw -d mysql:tag // tag specific run docker
+sudo docker run -d -e MYSQL_ROOT_PASSWORD=my-secret-pw -d mysql:8.0
+
+sudo docker run -d -e MYSQL_ROOT_PASSWORD=qwerty -d --name mysql-older -p8080:3306  mysql:8.0 // run container with port and custom name
+
+sudo docker exec -it 8b5e45a7d017 mysql -uroot -p // log into terminal of the mysql
+
+sudo docker rmi image_name or image_id // remove image using image_id or image_name | Before deleting image we need to delete container
+
+
+
+sudo docker logs cont_id|cont_name // check logs with container id
+
+sudo docker exec -it cont_id|cont_name /bin/bash //execute base shell command.
+
+sudo docker exec -it cont_id|cont_name /bin/sh   //execute shell command.
+
+
+
+sudo docker network ls // list all network
+
+sudo docker network create  mongo-network // create custom network
+
+sudo docker network rm network_name // remove etwork with network name
+
+There are some predefined network which cant be deleted - bridge, host, none
+
+
+
+==> Build image:
+
+-t for tag
+php-application - is image name with latest tag.
+. is the current directory.
+
+sudo docker build -f ./DockerPhp.dev -t php-application .
+
+
+==> execute shell command in docker container. List all file in app directory.
+docker exec -it <container_name_or_id> ls -l /path/to/app
+sudo docker exec -it 6f5ecca49083 ls -l /app
+
+
+==> download files from container.
+docker cp <container_id_or_name>:/path/in/container /path/on/host
+sudo docker cp 6f5ecca49083:/app/test.json ./
+
+
+==> Copy local file into container.
+docker cp ./my-local-folder my-container:/app/
+docker cp ./test3.json 6f5ecca49083:/app/
+
+
+==> Create new file in container
+sudo docker exec -it 6f5ecca49083 touch /app/test2.json
+
+
+==> list:
+sudo docker exec -it 6f5ecca49083 ls -l /app/
+sudo docker exec -it 6f5ecca49083 ls -l /var/www/html/ak/dock/dock2/
+
+
+==> ubuntu - Login as interactive mode in ubuntu.
+sudo docker run -it ubuntu
+
+
+==> automatically pick the following files for build. 
+docker-compose.yml, docker-compose.yaml, compose.yml, compose.yaml
+
+docker-compose up --build
+
+
+==> Start the container for the docker-compose file.
+sudo docker-compose start
+
+
+==> Stop containers from docker-compose file.
+sudo docker-compose stop
+
+
+==> Stop container and remove container  from docker-compose file.
+sudo docker-compose down
+
+
+==> run container in detech mode on port 3003
+sudo docker run -d -p 3003:3000 react-application
+
+
+
+Connect mysql with phpmyadmin:-
+
+sudo docker run -d --name mysql2 --network mongo-network -e MYSQL_ROOT_PASSWORD=rootpassword -e MYSQL_DATABASE=testdb -e MYSQL_USER=user -e MYSQL_PASSWORD=userpassword -v mysql_data:/var/lib/mysql -p 3307:3306 mysql:8.0
+
+sudo docker run -d  --name phpmyadmin --network mongo-network -e PMA_HOST=mysql2 -e PMA_PORT=3306 -e MYSQL_ROOT_PASSWORD=rootpassword -p 8080:80 phpmyadmin:5.2.2
+
+sudo docker exec -it 8b5e45a7d017 mysql -uroot -p
+
+
+
+Vite Old version docker:- We can not use docker file in this build we need to separtely exute the dockerfile.
+
+version: '2.4'  # Compatible with older Docker Engine (pre-2017) and Compose v1.x
+
+services:
+  react:
+    build: .
+    ports:
+      - "3011:5173"
+    volumes:
+      - ./app/src:/app/src
+    tty: true
+    stdin_open: true
+    environment:
+      - HOST=0.0.0.0
+
+
+
+
+sudo docker run -d \
+-p27017:27017 \
+--name mongo \
+--network  mongo-network \
+-e MONGO_INITDB_ROOT_USERNAME=admin \
+-e MONGO_INITDB_ROOT_PASSWORD=qwerty \
+mongo
+
+sudo docker run -d \
+-p8081:8081 \
+--name mongo-express \
+--network  mongo-network \
+-e ME_CONFIG_BASICAUTH_USERNAME=admin \
+-e ME_CONFIG_BASICAUTH_PASSWORD=admin123 \
+-e ME_CONFIG_MONGODB_URL="mongodb://admin:qwerty@mongo:27017" \
+mongo-express
+
+
+
+docker compose -f mongodb.yaml up -d 
+docker compose -f mongodb.yaml down
+
+mongodb.yaml
+version: '3.8'
+
+services:
+  mongo:
+    image: mongo
+    container_name: mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: qwerty
+    networks:
+      - mongo-network
+
+  mongo-express:
+    image: mongo-express
+    container_name: mongo-express
+    restart: always
+    ports:
+      - "8081:8081"
+    environment:
+      ME_CONFIG_BASICAUTH_USERNAME: admin
+      ME_CONFIG_BASICAUTH_PASSWORD: admin123  # Optional: Add this for UI login
+      ME_CONFIG_MONGODB_URL: mongodb://admin:qwerty@mongo:27017/
+    depends_on:
+      - mongo
+    networks:
+      - mongo-network
